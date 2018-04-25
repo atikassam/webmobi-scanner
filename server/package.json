@@ -1,0 +1,24 @@
+{
+  "name": "webmobi-scanner-server",
+  "version": "0.0.1-alpha",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "scanner"
+  ],
+  "author": "Atikur Rahman",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^9.6.6",
+    "gulp": "^3.9.1",
+    "gulp-typescript": "^4.0.2",
+    "socket.io": "^2.1.0",
+    "typescript": "^2.8.3"
+  },
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
