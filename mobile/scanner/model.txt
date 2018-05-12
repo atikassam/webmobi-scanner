@@ -1,0 +1,23 @@
+
+Open ---> Scan --> oAuth --> Scan --> Send QR details
+lifecycle -->
+  WEB:
+    onOAuth --> onConnect --> onMobileConnect --> onMobileDisconnect --> onScan --> onDisconnect
+  MOBILE:
+    onOAuth --> onConnect --> onDisconnect
+
+      mobile                                                      server                                                      web
+----------------------------------------------------------------------------------------------------------------------------------------------
+                                                              Verify API Code <--------------- REQ:API Code --------------- Request for token
+                                                              Create token --------------------- RES:Token ---------------> Connect to socket
+Scan QR from web ----------- REQ:Send code ----------> plugin with corresponding web connection
+connect to socket <----------- RES:token ------------- Create a token to validate socket
+scan QR code ------------ SOCKET:send code ----------> send code to web module ----------------> SOCKET:CODE ---------------> Handle qr code
+
+                                                                  EVENTS
+                                                      Mobile connected(MOBILE_CONNECT) -------------- Token ------------> Handle event
+                                                    Mobile disconnected(MOBILE_OFFLINE) ------------- Token ------------> Handle event
+Mobile battery low -------------------------------> Mobile battery low(BATTERY_LOW) ------------------------------------> Handle event
+Handle event <------------------------------------- WEb app offline (APP_OFFLINE)
+
+

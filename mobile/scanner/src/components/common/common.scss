@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+common {
+  .main-view {
+    flex:1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100%;
+    color: rgba(0, 0, 0, .6);
+    text-align: center;
+
+    .logo-icon {
+      font-size: 10em;
+      margin-bottom: 20px;
+      color: #4ed473;
+    }
+
+    .title {
+      margin-bottom: 10px;
+      font-size: 1.7em;
+      font-weight: 200;
+    }
+
+    .subtitle {
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 0 25px;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  .main-view.primary {
+    .logo-icon {
+      color: #4ed473;
+    }
+  }
+  .main-view.secondary  {
+    .logo-icon
+    , .subtitle {
+      color: #d4559d;
+    }
+  }
+  .main-view.warning  {
+    .logo-icon
+    , .subtitle {
+      color: #ffef6b;
+    }
+  }
+  .main-view.error  {
+    .logo-icon
+    , .subtitle {
+      color: #ff6960;
+    }
+  }
+}

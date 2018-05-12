@@ -2,22 +2,23 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack');
 
-const _BUILD_PATH_ = 'dist';
+const _BUILD_PATH_ = './dist';
 
 module.exports = {
 	// Set entry point
-	entry: './src/sdk/index.ts'
+	entry: './src/sdk/index.tsx'
 	
 	// Set output path
 	, output: {
 		filename: 'index.js'
 		, path: path.resolve(__dirname, _BUILD_PATH_)
+        // , publicPath: '/'
 	}
 	
 	// Set typescript loader 
 	, module: {
 		rules: [
-			{ test: /\.ts$/, use: 'ts-loader' }
+			{ test: /\.tsx$/, use: 'ts-loader' }
 		]
 	}
 	
@@ -31,7 +32,8 @@ module.exports = {
 	]
 	
 	, devServer: {
-		contentBase: _BUILD_PATH_
+		inline: false
+		, contentBase: path.resolve(__dirname,  _BUILD_PATH_)
 		, hot: true
 	}
 }

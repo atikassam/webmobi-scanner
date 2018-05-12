@@ -1,0 +1,18 @@
+<div [ngClass]="['main-view', view_type]">
+  <ion-icon [name]="view_logo" class="logo-icon"></ion-icon>
+  <span class="title">{{ view_title }}</span>
+  <span class="subtitle">{{ view_subtitle }}</span>
+
+  <div class="button-group">
+    <ng-container *ngFor="let btn of view_buttons">
+      <button ion-button outline (click)="btn.click()" [disabled]="btn.disabled">
+        <ng-container *ngIf="btn.icon; else titld_btn">
+          <ion-icon [ios]="btn.icon" [md]="btn.icon"></ion-icon>
+        </ng-container>
+        <ng-template #titld_btn>
+          {{ btn.title }}
+        </ng-template>
+      </button>
+    </ng-container>
+  </div>
+</div>

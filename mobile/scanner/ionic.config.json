@@ -1,6 +1,6 @@
 {
-  "name": "scanner",
-  "app_id": "",
+  "name": "webmobi",
+  "app_id": "com.linowis.webmobi",
   "type": "ionic-angular",
   "integrations": {
     "cordova": {}
