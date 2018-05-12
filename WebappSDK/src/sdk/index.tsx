@@ -4,7 +4,10 @@ import * as QRCode from 'qrcode.react';
 import * as io from 'socket.io-client';
 import * as $ from 'jquery';
 
-
+/**
+ * These are the application states
+ * for different different situation
+ */
 export enum ConnectionStates {
     _AUTHENTICATING_
     , _AUTHENTICATING_FAIL_
@@ -21,6 +24,9 @@ export enum ConnectionStates {
     , _ERROR_
 }
 
+/**
+ * These are the socket events
+ */
 export enum Events {
     WEBAPP_STATE_CHANGE = 'WEBAPP_STATE_CHANGE'
     , _SCAN_CODE_ = '_SCAN_CODE_'
@@ -32,11 +38,48 @@ export enum Events {
     , _MOBILE_DISCONNECTED_ = '_MOBILE_DISCONNECTED_'
 }
 
+/**
+ * It is main Scanner component which provides
+ * all the functionality for the module
+ */
 class Scanner extends React.Component {
+    /**
+     * This the endpoint for the socket connection
+     * which will used to communicate with the scanner
+     * in realtime
+     *
+     * @type {string}
+     * @private
+     */
     private static _URL_ = 'http://localhost:8080/web';
+
+    /**
+     * This endpoint will be used to obtain a token
+     * from server. obtained token is required to connect
+     * socket connection
+     *
+     * @type {string}
+     * @private
+     */
     private static _URL_AUTH_ = 'http://localhost:8080/request/token/';
+
+    /**
+     * This token is required to send as a query
+     * parameter while creating a socket connection
+     */
     private token;
+
+    /**
+     * created socket instance
+     */
     private io;
+
+    /**
+     * This flag is used to identify whether currently
+     * a scanner(mobile) is connected or not
+     *
+     * @type {boolean}
+     */
     private isMobileConnected = false;
 
     constructor(public props) {
@@ -44,6 +87,9 @@ class Scanner extends React.Component {
         this.connect();
     }
 
+    /**
+     * Here we have all the socket event listeners
+     */
     private setListeners() {
 
         this.io.on('connect', () => {
@@ -85,32 +131,38 @@ class Scanner extends React.Component {
 
     }
 
+    /**
+     * This is the clean up method, here we will
+     * remove all the listeners, reset properties
+     * an all other things which is required to
+     * clean up the connection or to bring
+     * the connection in previous state
+     */
     private resetConnection() {
-        this.io.removeAllListeners('connect');
-        this.io.removeAllListeners('disconnect');
-
-        this.io.removeAllListeners(Events._BATTERY_LOW_);
-        this.io.removeAllListeners(Events._MOBILE_DISCONNECTED_);
-        this.io.removeAllListeners(Events._MOBILE_OFFLINE_);
-        this.io.removeAllListeners(Events._MOBILE_ONLINE_);
+        this.io.removeAllListeners();
 
         this.token = null;
         this.io.disconnect();
         this.io = null;
     }
 
+    /**
+     * This method is used to create a connection
+     * with server. All process to connect to the
+     * server is done here
+     */
     connect() {
-        if (this.io) {
-            this.io.connect();
-            return;
-        }
+        if (this.io) { return; }
 
         this.onStateChange(ConnectionStates._AUTHENTICATING_);
         $.get(Scanner._URL_AUTH_, (data) => {
             if (data.token) {
+
                 this.token = data.token;
+
                 this.onStateChange(ConnectionStates._CONNECTING_);
                 this.io = io(Scanner._URL_, { query: { token: data.token }});
+
                 this.setListeners();
 
             } else {
@@ -118,10 +170,16 @@ class Scanner extends React.Component {
             }
         })
     }
+
+    /**
+     * Overwrite the react components method
+     * @param {((prevState: Readonly<S>, props: P) => (Pick<S, K> | S | null)) | Pick<S, K extends keyof S> | S | null} props
+     */
     setState(props) {
         super.setState({ props });
     }
 
+    // Reacts render method
     render() {
         let state: any = this.state || {}
             , { qr, type, title, subtitle, button } : any =  state.props || {}
@@ -184,8 +242,20 @@ class Scanner extends React.Component {
         );
     }
 
+    /**
+     * In this method we change the view
+     * of the gadget depending on the gadget
+     * state
+     *
+     * @param state
+     */
     onStateChange( state ) {
-        console.log(state);
+        let disconnectButton = {
+            title: 'Disconnect'
+            , onClick: () => {
+                this.io.emit(Events._MOBILE_DISCONNECTED_);
+            }
+        };
         switch (state) {
             case ConnectionStates._READY_:
                 this.setState({
@@ -222,12 +292,7 @@ class Scanner extends React.Component {
                 this.setState({
                     type: 'primary'
                     , title: 'CONNECTED'
-                    , button: {
-                        title: 'Disconnect'
-                        , onClick: () => {
-                            this.io.emit(Events._MOBILE_DISCONNECTED_);
-                        }
-                    }
+                    , button: disconnectButton
                 });
                 break;
             case ConnectionStates._BATTERY_LOW_:
@@ -235,6 +300,7 @@ class Scanner extends React.Component {
                     type: 'warning'
                     , title: 'CONNECTED'
                     , subtitle: 'Phone battery low'
+                    , button: disconnectButton
                 });
                 break;
             case ConnectionStates._MOBILE_OFFLINE_:
@@ -242,6 +308,7 @@ class Scanner extends React.Component {
                     type: 'warning'
                     , title: 'OFFLINE'
                     , subtitle: 'Your mobile is offline'
+                    , button: disconnectButton
                 });
                 break;
             case ConnectionStates._OFFLINE_:
@@ -256,8 +323,18 @@ class Scanner extends React.Component {
     }
 }
 
-
-
+/**
+ * This method is used to add the scanner gadget into
+ * a given element
+ *
+ * here we will render the gadget into a given
+ * element
+ *
+ * @param id
+ * @param onScan
+ * @returns {any}
+ * @constructor
+ */
 window['WebmobiScanner'] = function (id, onScan) {
     let scanner = <Scanner onScan = { onScan }/>;
 
@@ -266,7 +343,7 @@ window['WebmobiScanner'] = function (id, onScan) {
         document.getElementById(id)
     );
 
-     return scanner;
+    return scanner;
 };
 
 /*

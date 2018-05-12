@@ -10,10 +10,9 @@ import { Subject } from "rxjs";
   and Angular DI.
 */
 export enum _ENDPOINTS_ {
-  _AUTH_ = ''
-  , _CONNECT_ = 'http://192.168.43.67:8080/mobile'
+  _CONNECT_ = 'http://192.168.43.67:8080/mobile'
+  // , _AUTH_ = ''
 }
-
 export enum Events {
   WEBAPP_STATE_CHANGE = 'WEBAPP_STATE_CHANGE'
   , _SCAN_CODE_ = '_SCAN_CODE_'
@@ -24,7 +23,6 @@ export enum Events {
   , _MOBILE_ONLINE_ = '_MOBILE_ONLINE_'
   , _MOBILE_DISCONNECTED_ = '_MOBILE_DISCONNECTED_'
 }
-
 export enum ConnectionStates {
   READY
   , AUTHENTICATING
@@ -43,7 +41,6 @@ export enum ConnectionStates {
 let _SOCKET_;
 @Injectable()
 export class ScannerConnectionProvider {
-  private socket;
   public onStateChange = new Subject();
   get connected() {
     if (!_SOCKET_) {
@@ -61,7 +58,7 @@ export class ScannerConnectionProvider {
 
   /**
    * Authenticate the connection
-   * @param code
+   * @param token
    */
   auth(token) {
     if(this.connected) return;
@@ -114,6 +111,7 @@ export class ScannerConnectionProvider {
 
   /**
    * Send scanned code to the web
+   *
    * @param {any} code
    * @param cb
    */
@@ -122,8 +120,10 @@ export class ScannerConnectionProvider {
 
     _SOCKET_.emit(Events._SCAN_CODE_, { code }, cb);
   }
+
   /**
    * Create socket connection
+   *
    * @param {any} token
    */
   private connectToSocket({ token }) {
@@ -176,5 +176,3 @@ export class ScannerConnectionProvider {
     _SOCKET_.removeAllListeners();
   }
 }
-
-window.addEventListener('error', function(event) { });

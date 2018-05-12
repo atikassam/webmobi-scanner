@@ -1,5 +1,8 @@
 import * as uuid from 'uuid';
 
+/**
+ * These are the socket events
+ */
 export enum Events {
     WEBAPP_STATE_CHANGE = 'WEBAPP_STATE_CHANGE'
     , _SCAN_CODE_ = '_SCAN_CODE_'
@@ -11,28 +14,77 @@ export enum Events {
     , _MOBILE_DISCONNECTED_ = '_MOBILE_DISCONNECTED_'
 }
 
+/**
+ * Here we store client ids which will be
+ * used to avoid duplicate id while generating new client id
+ * @type {any[]}
+ * @private
+ */
 const _IDS_ = [];
+
+/**
+ * This class will handle all the major functionality
+ * of this application, It will act as a bridge in between
+ * web socket and mobile socket
+ */
 export class Client {
+
+    /**
+     * Its is the time after which the offline client
+     * will be disconnected
+     *
+     * @type {number}
+     * @private
+     */
     private static _RECONNECT_TIMEOUT_ = 1000*60*1;
+
+    /**
+     * This is mobile clients socket instance
+     */
     private mobile;
+
+    /**
+     * this is web clients socket instance
+     */
     private web;
+
     private mobile_reconnect_timer;
     private web_reconnect_timer;
+
+    /**
+     * Both mobile and web will use this token to
+     * establish the socket connection
+     */
     public token;
 
     constructor( public id) {
         this.resetToken();
     }
+
+    /**
+     * this method is used to attach web socket
+     *
+     * @param web
+     */
     connect(web) {
         this.web = web;
         this.setWebListeners();
     }
+
+    /**
+     * this method is used to detach a socket connection
+     */
     disconnect() {
         this.removeWebListeners();
         this.remove();
         this.web = null;
     }
 
+    /**
+     * This method is used to attach mobile socket
+     *
+     * @param mobile
+     */
     join(mobile) {
         if (!(this.web && this.web.connected)) return;
 
@@ -46,12 +98,20 @@ export class Client {
         // Emit to the web that mobile is now connected
         this.safeEmit(this.web, Events._MOBILE_ONLINE_);
     }
+
+    /**
+     * this method is used to detach mobile socket
+     */
     remove() {
         this.removeMobileListeners();
         if(this.mobile.connected) this.mobile.disconnect();
         this.mobile = null;
     }
 
+    /**
+     * create socket token
+     * @returns {any}
+     */
     resetToken() {
         do {
             this.token = uuid.v4();
@@ -60,6 +120,9 @@ export class Client {
         return this.token;
     }
 
+    /**
+     * set all web socket listeners here
+     */
     private setWebListeners() {
         this.web.on('disconnect', () => {
             if (!this.mobile) return;
@@ -78,10 +141,17 @@ export class Client {
             this.remove();
         });
     }
+
+    /**
+     * Remove all web socket listeners
+     */
     private removeWebListeners() {
         this.web.removeAllListeners();
     }
 
+    /**
+     * set all mobile socket listeners
+     */
     private setMobileListeners() {
         if (!this.mobile) return;
 
@@ -119,6 +189,10 @@ export class Client {
             this.remove();
         })
     }
+
+    /**
+     * remove all mobile socket listeners
+     */
     private removeMobileListeners() {
         if (!this.mobile) return;
 
@@ -128,12 +202,17 @@ export class Client {
         this.safeEmit(this.mobile, Events._CONNECTION_DESTROYED_);
         this.safeEmit(this.web, Events._MOBILE_DISCONNECTED_);
     }
+
+
     private safeEmit(...data) {
         let [ socket, ...arg ] = data;
         socket.emit.apply(socket, arg);
     }
 }
 
+/**
+ * this class manages all the clients
+ */
 export class Clients {
     public clients: any = [];
 
@@ -144,12 +223,20 @@ export class Clients {
             client = this.clients.find(_c => _c.id === id);
         }
         if(!id || client) {
-            client= new Client(uuid.v4());
+            client = new Client(uuid.v4());
         }
 
         this.clients.push(client);
         return client;
     }
+
+    /**
+     * Join a mobile client
+     *
+     * @param mobile_socket
+     * @param token
+     * @returns {boolean}
+     */
     joinMobile(mobile_socket, token) {
 
         let client: Client = this.clients.find((_c) => _c.token === token);
@@ -161,6 +248,14 @@ export class Clients {
             return false;
         }
     }
+
+    /**
+     * Join a web client
+     *
+     * @param web_socket
+     * @param token
+     * @returns {boolean}
+     */
     joinWeb(web_socket, token) {
 
         let client: Client = this.clients.find((_c) => _c.token === token);
