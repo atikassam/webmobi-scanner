@@ -116,10 +116,12 @@ class Scanner extends React.Component {
             this.onStateChange(ConnectionStates._READY_);
         });
         this.io.on(Events._MOBILE_OFFLINE_, () => {
+            this.isMobileConnected = true;
             this.onStateChange(ConnectionStates._MOBILE_OFFLINE_);
         });
         this.io.on(Events._MOBILE_ONLINE_, () => {
             this.isMobileConnected = true;
+            console.log('mobile online');
             this.onStateChange(ConnectionStates._MOBILE_ONLINE_);
         });
 
@@ -127,8 +129,7 @@ class Scanner extends React.Component {
             if (this.io.connected) {
                 this.onStateChange(ConnectionStates._READY_);
             }
-        }, 5000)
-
+        }, 5000);
     }
 
     /**
@@ -155,7 +156,13 @@ class Scanner extends React.Component {
         if (this.io) { return; }
 
         this.onStateChange(ConnectionStates._AUTHENTICATING_);
-        $.get(Scanner._URL_AUTH_, (data) => {
+        $.ajax({
+            url: Scanner._URL_AUTH_
+            , type: "GET"
+            , xhrFields: {
+                withCredentials: true
+            }
+        }).done((data) => {
             if (data.token) {
 
                 this.token = data.token;
@@ -164,11 +171,12 @@ class Scanner extends React.Component {
                 this.io = io(Scanner._URL_, { query: { token: data.token }});
 
                 this.setListeners();
-
             } else {
                 this.onStateChange(ConnectionStates._AUTHENTICATING_FAIL_)
             }
-        })
+        }).fail(function(jqXHR, textStatus) {
+            this.onStateChange(ConnectionStates._AUTHENTICATING_FAIL_)
+        });
     }
 
     /**
@@ -254,15 +262,19 @@ class Scanner extends React.Component {
             title: 'Disconnect'
             , onClick: () => {
                 this.io.emit(Events._MOBILE_DISCONNECTED_);
+                this.onStateChange(ConnectionStates._READY_);
+                this.isMobileConnected = false;
             }
         };
         switch (state) {
             case ConnectionStates._READY_:
-                this.setState({
-                    type: 'primary'
-                    , qr: this.token
-                    , subtitle: 'Scan qr to connect'
-                });
+                if(!this.isMobileConnected) {
+                    this.setState({
+                        type: 'primary'
+                        , qr: this.token
+                        , subtitle: 'Scan qr to connect'
+                    });
+                }
                 break;
             case ConnectionStates._AUTHENTICATING_:
                 this.setState({

@@ -1,23 +1,29 @@
 <html>
 <head>
-    <title>Gulp POC</title>
+    <title>Webmobi scanner</title>
 </head>
 <body style="background: #f5f5f5">
-<div style="display: flex; align-items: center; justify-content: center; height: 100%">
-    <div style="color: rgba(0, 0, 0, .6)" align="center">
-        <image style="width: 120px" src="http://www.codingpedia.org/wp-content/uploads/2014/04/gulp-2x.png"/>
-        
-        <h1 style="color: rgba(0, 0, 0, .6)">Webmobi scanner</h1>
-        <span id="sub">See <a href="./example.html">example</a>, <a href="./app/app.apk">download app</a></span>
-        <div id="scanner"></div>
-        <div id="code"></div>
+<div>
+    <div style="display: flex; align-items: center; justify-content: center; height: 100%">
+        <div style="color: rgba(0, 0, 0, .6)" align="center">
+            <image style="width: 120px" src="https://www.visione.com/wp-content/uploads/2016/09/qr-bar-code-scan.png"/>
+
+            <h1 style="color: rgba(0, 0, 0, .6)">Webmobi scanner</h1>
+            <span id="sub"><a href="./app/app.apk">Download app</a></span>
+            <div id="scanner"></div>
+            <div id="code"></div>
+        </div>
+    </div>
+    <div>
+
     </div>
 </div>
+
 <script src="./lib/webmobi.js"></script>
 <script>
-    WebmobiScanner('scanner', function (token) {
-        document.getElementById('code').innerHTML = token.text;
-        console.log(token);
+    WebmobiScanner('scanner', function (scan) {
+        document.getElementById('code').innerHTML = scan.code.text;
+        console.log(scan);
     });
 </script>
 </body>

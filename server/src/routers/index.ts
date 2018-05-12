@@ -19,7 +19,7 @@ routers.get('/request/token/', (req, res)=> {
     let client = _CLIENTS_.client(id);
 
     console.log(client.id);
-    res.cookie('id', client.id);
+    res.cookie('id', client.id, { maxAge: 900000, httpOnly: true });
     res.json({ token: client.token });
     // res.json({ token: { token: client.token, url: `http://${_IPV4_}:${_PORT_}`} });
 });

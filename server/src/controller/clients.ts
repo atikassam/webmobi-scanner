@@ -68,6 +68,11 @@ export class Client {
      */
     connect(web) {
         this.web = web;
+        this.safeEmit(this.mobile, Events.WEBAPP_STATE_CHANGE, true);
+        if(this.mobile) {
+            this.safeEmit(this.web, Events._MOBILE_ONLINE_, this.mobile.connected);
+        }
+        if (this.mobile_reconnect_timer) clearTimeout(this.mobile_reconnect_timer);
         this.setWebListeners();
     }
 
@@ -104,7 +109,7 @@ export class Client {
      */
     remove() {
         this.removeMobileListeners();
-        if(this.mobile.connected) this.mobile.disconnect();
+        if(this.mobile && this.mobile.connected) this.mobile.disconnect();
         this.mobile = null;
     }
 
@@ -206,7 +211,7 @@ export class Client {
 
     private safeEmit(...data) {
         let [ socket, ...arg ] = data;
-        socket.emit.apply(socket, arg);
+        if(socket) socket.emit.apply(socket, arg);
     }
 }
 
@@ -220,10 +225,13 @@ export class Clients {
         let client;
 
         if(id){
+            console.log(id, 'old id')
             client = this.clients.find(_c => _c.id === id);
+            console.log('old')
         }
-        if(!id || client) {
+        if(!client) {
             client = new Client(uuid.v4());
+            console.log('new')
         }
 
         this.clients.push(client);

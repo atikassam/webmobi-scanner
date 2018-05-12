@@ -13,11 +13,12 @@ const socket_engine = io(server);
 // Use cors to enable cross origin access
 http_engine.use(cors({ origin: '*' }));
 
+// Cookies parsing middleware
+http_engine.use(cookieParser());
+
 // Public directory for static file like example, welcome page
 http_engine.use(express.static(__dirname+'/public'));
 
-// Cookies parsing middleware
-http_engine.use(cookieParser());
 
 // Add routers
 http_engine.use('/', routers);
