@@ -4,6 +4,7 @@ import * as QRCode from 'qrcode.react';
 import * as io from 'socket.io-client';
 import * as $ from 'jquery';
 
+
 export enum ConnectionStates {
     _AUTHENTICATING_
     , _AUTHENTICATING_FAIL_
@@ -257,7 +258,7 @@ class Scanner extends React.Component {
 
 
 
-export function WebmobiScanner(id, onScan) {
+window['WebmobiScanner'] = function (id, onScan) {
     let scanner = <Scanner onScan = { onScan }/>;
 
     ReactDOM.render(
@@ -266,8 +267,10 @@ export function WebmobiScanner(id, onScan) {
     );
 
      return scanner;
-}
+};
 
+/*
 WebmobiScanner('root', (token)=>{
     console.log(token);
 });
+*/

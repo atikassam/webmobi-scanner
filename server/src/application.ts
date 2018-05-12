@@ -12,9 +12,11 @@ const server = (<any>http).Server(http_engine);
 const socket_engine = io(server);
 
 http_engine.use(cors({ origin: '*' }));
-// http_engine.use(bodyParser.json());
+
+http_engine.use(express.static(__dirname+'/public'));
 http_engine.use(cookieParser());
 http_engine.use('/', routers);
+
 
 socket_engine.of('/mobile').use(handler('mobile'));
 socket_engine.of('/web', ).use(handler('web'));

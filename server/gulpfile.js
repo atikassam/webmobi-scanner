@@ -14,3 +14,10 @@ gulp.task('default', () => {
 			.js.pipe(gulp.dest(_BUILD_PATH_));
 })
 
+gulp.task('copy-public', () => {
+    return gulp.src('./src/public/**/*')
+        .pipe(gulp.dest(_BUILD_PATH_+'/public'))
+})
+
+gulp.task('build', ['copy-public', 'default']);
+

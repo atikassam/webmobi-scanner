@@ -5,12 +5,13 @@ const webpack = require('webpack');
 const _BUILD_PATH_ = './dist';
 
 module.exports = {
+    mode: 'development'
 	// Set entry point
-	entry: './src/sdk/index.tsx'
+	, entry: './src/sdk/index.tsx'
 	
 	// Set output path
 	, output: {
-		filename: 'index.js'
+		filename: 'webmobi.js'
 		, path: path.resolve(__dirname, _BUILD_PATH_)
         // , publicPath: '/'
 	}
